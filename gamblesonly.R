@@ -25,31 +25,15 @@ data <- df %>%
   ))%>%
   mutate(participant = `ResponseId`)
 
-fit1 <- lme4::lmer(
-  response ~ 1 + (1|participant)+ (1|block) + (1|participant:block),
-  data = data,
-  control = lmerControl(optimizer = 'bobyqa'),
-  REML = TRUE
+#install.packages('brms')
+library(brms)
+
+fit1_brms <- brm(
+  response ~ 1 + (1|participant) + (1|block) + (1|participant:block),
+  data = data, 
+  cores = 4, # May need to change depending on your computer
+  iter = 2000
 )
 
-summary(fit1)
-
-# vcov is the VC (variance component), sdcor is square root of vcov, grp is the specific cluster/random effect
-vars <- data.frame(lme4::VarCorr(fit1))
-
-# this calculates VPC (variance partitioning coefficient) which divides each vcov by the total variance = proportion of total variance
-vars$vpc <- vars$vcov/sum(vars$vcov)
-
-randeff <- lme4::ranef(fit1)
-
-vpc1 <- compute_vpc(
-  data,
-  glmer = FALSE,
-  dv = "response",
-  idyo_ivs = c("participant"),
-  shared_ivs = c("block"),
-  additional_ivs = c("participant:block")
-)
-
-vpc1
-
+summary(fit1_brms)
+VarCorr(fit1_brms)
