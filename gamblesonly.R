@@ -5,8 +5,6 @@ source("./vpcR.R")
 library(lme4)
 library(kableExtra)
 
-df <- qualtRics::read_survey("./gambles.csv")
-
 # 40 - 81, gamble 1
 # 1 - 39, 4000, 4100, 4200, gamble 2
 
@@ -24,6 +22,7 @@ data <- df %>%
     between(num, 1, 4200) ~ "2"
   ))%>%
   mutate(participant = `ResponseId`)
+
 
 #install.packages('brms')
 library(brms)
